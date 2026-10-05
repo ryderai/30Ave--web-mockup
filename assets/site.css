@@ -539,3 +539,28 @@ body.menu-open .site-header .nav-cta{background:var(--ink);color:var(--paper);bo
 .foot-mark{margin-top:clamp(8px,2vw,24px)}
 /* show only "30 AVENUE"; the script line sits below the crop. 572x221 logo → crop at 60% of its height */
 .foot-mark-crop{aspect-ratio:572/132;overflow:hidden}
+
+/* ---------- Footer on phones: compact (Oct 5 2026) ---------- */
+@media (max-width:760px){
+  .photo-band{min-height:400px}
+  .photo-band .wrap{padding-top:90px;padding-bottom:36px}
+  .photo-band h2{font-size:clamp(2.6rem,12vw,3.4rem);margin-bottom:.1em}
+  .band-inner{gap:20px}
+  .band-inner .actions{gap:8px;width:100%}
+  .band-inner .btn{min-height:46px;padding:.8em 1.1em;font-size:.68rem;letter-spacing:.16em;flex:1 1 auto}
+  .foot-grid{grid-template-columns:1fr 1fr;gap:32px 20px;padding-top:44px;padding-bottom:28px}
+  .foot-about{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .foot-brand{margin:0}
+  .foot-brand .logo{height:44px}
+  .foot-about p,.social-note,.foot-small,.foot-next{display:none}
+  .social{margin:0}
+  .foot-col h2{margin-bottom:12px}
+  .foot-col address,.foot-line{font-size:1.02rem;line-height:1.4}
+  .foot-line{margin-top:6px}
+  .foot-col .link-arrow{margin-top:10px;padding:6px 0;font-size:.66rem}
+  .foot-grid > .foot-col:nth-child(2){grid-column:1/-1}
+  .site-footer li a{font-size:1rem;padding:3px 0}
+  .site-footer .foot-bottom{margin-top:0;padding-top:16px;font-size:.74rem;flex-direction:column;gap:6px}
+  .foot-legal{gap:18px}
+  .site-footer .ai-syndicate-credit{padding-bottom:18px;margin-top:4px}
+}
