@@ -1,0 +1,3 @@
+# AI search optimization (GEO) for this site by AI Syndicate — https://aisyndicate.com
+User-agent: *
+Disallow: /
