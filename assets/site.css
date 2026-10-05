@@ -488,3 +488,54 @@ body.menu-open .site-header .nav-cta{background:var(--ink);color:var(--paper);bo
 @media (max-width:760px){.hero::after{background:linear-gradient(180deg,rgba(12,12,11,.45) 0%,rgba(12,12,11,.15) 25%,rgba(12,12,11,.45) 50%,rgba(12,12,11,.82) 100%)}}
 @media (max-width:980px){.map-embed .map-results{max-height:460px}}
 @media (max-width:520px){.ptile-cap small,.tag{letter-spacing:.1em}.people-grid{gap:28px 12px}}
+
+/* =====================================================================
+   FOOTER v2 (Oct 5 2026) — closing photo, five clear columns, quiet logo signature
+   ===================================================================== */
+.photo-band{min-height:min(72svh,680px)}
+.photo-band img.bg{object-position:50% 62%}
+.photo-band::before{background:linear-gradient(180deg,rgba(12,12,11,.18) 0%,rgba(12,12,11,0) 30%,rgba(12,12,11,.35) 58%,rgba(12,12,11,.8) 100%)}
+.band-inner{display:flex;justify-content:space-between;align-items:flex-end;gap:32px 48px;flex-wrap:wrap}
+.band-inner h2{margin:0}
+.band-inner .actions{margin:0 0 10px}
+.site-footer{position:relative;overflow:hidden}
+.foot-grid{grid-template-columns:1.35fr 1fr .8fr .8fr 1.1fr;gap:40px clamp(28px,3vw,56px);padding-top:clamp(72px,8vw,112px);padding-bottom:clamp(48px,6vw,80px)}
+.foot-col h2{margin-bottom:22px}
+.foot-brand{display:inline-block;color:var(--on-night);margin-bottom:26px}
+.foot-brand .logo{height:68px;width:auto;margin:0}
+.foot-about p{font-family:var(--serif);font-size:1.18rem;line-height:1.45;color:var(--on-night);max-width:30ch;font-weight:360}
+.foot-col address{font-style:normal;font-family:var(--serif);font-size:1.18rem;line-height:1.45;color:var(--on-night)}
+.foot-line{margin:10px 0 0;font-family:var(--serif);font-size:1.18rem}
+.foot-line a{text-decoration:none;border-bottom:1px solid rgba(244,241,234,.4)}
+.foot-line a:hover{border-bottom-color:currentColor}
+.foot-small{font-size:.86rem;color:var(--on-night-2);margin:16px 0 18px;max-width:28ch}
+.foot-small a{color:var(--on-night)}
+.site-footer .link-arrow{color:var(--on-night)}
+.site-footer li a{padding:5px 0;font-size:1.12rem}
+.social{align-items:center;flex-wrap:wrap;margin-top:22px}
+.social-note{font-size:.78rem;color:var(--on-night-2);margin-left:8px;letter-spacing:.02em}
+.foot-next .events{margin-bottom:18px}
+.foot-next .ev{display:block;padding:0;border:0}
+.foot-next .events .ev:last-child{border:0}
+.foot-next .ev .d{font-size:2.6rem;color:var(--on-night)}
+.foot-next .ev .d small{display:inline-block;margin:0 0 0 10px;color:var(--on-night-2);vertical-align:middle}
+.foot-next .ev .d::after{display:none}
+.foot-next .ev h3{font-size:1.25rem;margin:14px 0 4px;color:var(--on-night)}
+.foot-next .ev p{display:none}
+.foot-next .ev .t{color:var(--on-night-2);font-size:.7rem}
+/* the logo, drawn huge and quiet — decorative; a fixed colour, never opacity on currentColor */
+.foot-mark{padding:0 var(--gutter);max-width:1720px;margin:0 auto;line-height:0;color:#2B2925;user-select:none;pointer-events:none}
+.foot-mark .logo{width:100%;height:auto;display:block;color:#2B2925}
+.foot-mark .logo path{fill:#2B2925}
+.site-footer .foot-bottom{margin-top:clamp(24px,3vw,40px);padding-top:22px;border-top:1px solid rgba(244,241,234,.14)}
+.foot-legal{display:flex;gap:22px}
+.foot-legal a{color:var(--on-night-2);text-decoration:none;padding:4px 0}
+.foot-legal a:hover{color:var(--on-night);text-decoration:underline}
+@media (max-width:1180px){.foot-grid{grid-template-columns:1.2fr 1fr 1fr}.foot-about{grid-column:1/-1}.foot-next{grid-column:auto}}
+@media (max-width:760px){.foot-grid{grid-template-columns:1fr 1fr;gap:44px 24px}.foot-about,.foot-next{grid-column:1/-1}.band-inner .actions{margin:0}}
+@media (max-width:340px){.foot-grid{grid-template-columns:1fr}}
+.photo-band::before{background:linear-gradient(180deg,rgba(12,12,11,.2) 0%,rgba(12,12,11,.05) 22%,rgba(12,12,11,.5) 48%,rgba(12,12,11,.84) 100%)}
+.site-footer .ai-syndicate-credit{padding-bottom:28px}
+.foot-mark{margin-top:clamp(8px,2vw,24px)}
+/* show only "30 AVENUE"; the script line sits below the crop. 572x221 logo → crop at 60% of its height */
+.foot-mark-crop{aspect-ratio:572/132;overflow:hidden}
