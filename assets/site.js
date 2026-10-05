@@ -15,7 +15,7 @@
   /* ---------- 1. Header + mobile menu ---------- */
   var header = $(".site-header");
   if (header) {
-    var onScroll = function () { header.classList.toggle("scrolled", window.scrollY > 8); };
+    var onScroll = function () { header.classList.toggle("scrolled", window.scrollY > 24); };
     onScroll(); window.addEventListener("scroll", onScroll, { passive: true });
   }
   var menuBtn = $(".menu-btn"), nav = $("#site-nav");
@@ -24,6 +24,7 @@
       menuBtn.setAttribute("aria-expanded", String(open));
       if (open) nav.style.top = Math.max(0, header.getBoundingClientRect().bottom) + "px";
       nav.classList.toggle("open", open);
+      document.body.classList.toggle("menu-open", open);
       document.body.style.overflow = open ? "hidden" : "";
       $$("main, footer, .chat-fab, .concept").forEach(function (el) { if (open) el.setAttribute("inert", ""); else el.removeAttribute("inert"); });
       if (open) { var f = nav.querySelector("a,button"); if (f) f.focus(); }
@@ -128,9 +129,10 @@
       if (b.phone) bits.push('<a href="tel:+1' + b.phone.replace(/\D/g, "") + '">Call ' + esc(b.phone) + "</a>");
       if (b.web) bits.push('<a href="' + esc(b.web) + '" target="_blank" rel="noopener" aria-label="' + esc(b.name) + ' website (opens in a new tab)">Website</a>');
       if (b.unit && !state.sel) bits.push('<button type="button" data-show="' + bldgOf(b) + '">Show on map<span class="sr-only">: ' + esc(b.name) + "</span></button>");
-      return '<div class="biz"><div class="biz-top"><b>' + esc(b.name) + '</b><span class="unit">' + (b.unit ? "SUITE " + esc(b.unit) : "") + "</span></div>" +
+      var th = b.photo ? '<img class="biz-th" src="/assets/img/biz/' + b.photo + '-700.webp" alt="" loading="lazy">' : (b.logo ? '<img class="biz-th logo" src="/assets/img/logo/' + b.slug + '.png" alt="" loading="lazy">' : '<span class="biz-th none" aria-hidden="true">' + esc(b.name.charAt(0)) + "</span>");
+      return '<div class="biz">' + th + '<div class="biz-main"><div class="biz-top"><b>' + esc(b.name) + '</b><span class="unit">' + (b.unit ? "SUITE " + esc(b.unit) : "") + "</span></div>" +
         '<div class="meta">' + tags + (b.hours ? " · " + esc(b.hours) : "") + (b.note ? " · " + esc(b.note) : "") + "</div>" +
-        '<div class="row">' + bits.join("") + "</div></div>";
+        '<div class="row">' + bits.join("") + "</div></div></div>";
     }
     function render() {
       paint();
@@ -224,8 +226,16 @@
   var chats = $$(".chat");
   if (!chats.length) return;
 
-  function L(slug) { var b = bySlug(slug); if (!b) return ""; return '<a href="/directory/' + b.slug + '/">' + esc(b.name) + "</a>" + (b.unit ? " (Suite " + b.unit + ")" : ""); }
+  function L(slug) { var b = bySlug(slug); if (!b) return ""; return '<a href="/directory/' + b.slug + '/">' + esc(b.name) + "</a>"; }
   function H(slug) { var b = bySlug(slug); return b && b.hours ? " — " + esc(b.hours) : ""; }
+  // a place card inside a reply: photo, name, suite + hours, Details / Map links
+  function C(slug, note) {
+    var b = bySlug(slug); if (!b) return "";
+    var img = b.photo ? '<img src="/assets/img/biz/' + b.photo + '-700.webp" alt="" loading="lazy">' : '<span class="ph" aria-hidden="true">' + esc(b.name.charAt(0)) + "</span>";
+    return '<div class="pcard">' + img + '<div><b>' + esc(b.name) + "</b><span>" + (b.unit ? "Suite " + esc(b.unit) : "") + (b.hours ? " · " + esc(b.hours) : "") + "</span>" +
+      (note ? "<em>" + esc(note) + "</em>" : "") +
+      '<span class="pc-links"><a href="/directory/' + b.slug + '/">Details<span class="sr-only"> for ' + esc(b.name) + "</span></a>" + (b.unit ? '<a href="/map/?b=' + b.unit.charAt(0) + '">Map<span class="sr-only"> for ' + esc(b.name) + "</span></a>" : "") + "</span></div></div>";
+  }
   function nextEvents(n) {
     var list = AVE.events.filter(function (e) { return e.date >= tKey; }).slice(0, n);
     return list;
@@ -235,20 +245,20 @@
   var INTENTS = [
     { k: /plan|itinerar|whole day|day trip|schedule|first time/i, r: function () {
       var ev = nextEvents(1)[0];
-      return "Here is a sample day at 30Avenue — park once and spend the day:<ul>" +
-        "<li><b>Morning:</b> breakfast at " + L("canopy-road-cafe") + H("canopy-road-cafe") + ".</li>" +
-        "<li><b>Late morning:</b> browse " + L("willow-mercer") + ", " + L("southern-charm") + " and taste at " + L("30a-olive-oil") + ".</li>" +
-        "<li><b>Afternoon:</b> games at " + L("attycats-arcade") + ", then a scoop at " + L("marble-slab-creamery") + ".</li>" +
-        "<li><b>Evening:</b> dinner at " + L("cuvee-30a") + " or " + L("aja-elevated-asian") + (ev ? ", then " + esc(ev.title) + " (" + fmt(ev.date) + ", " + esc(ev.time) + ")" : "") + ".</li></ul>"; } },
-    { k: /breakfast|brunch|coffee|pancake|morning/i, r: function () { return "For breakfast or brunch, " + L("canopy-road-cafe") + " serves from-scratch breakfasts, omelets and giant pancakes" + H("canopy-road-cafe") + "."; } },
-    { k: /date|romantic|anniversar|nice dinner|fancy|upscale/i, r: function () { return "Three good picks for a night out:<ul><li>" + L("cuvee-30a") + H("cuvee-30a") + "</li><li>" + L("aja-elevated-asian") + H("aja-elevated-asian") + "</li><li>" + L("obscure-wine-company") + " — 50 wines by the glass" + H("obscure-wine-company") + "</li></ul>"; } },
-    { k: /kid|child|family|rain|arcade|game|bored/i, r: function () { return "With kids, start at " + L("attycats-arcade") + H("attycats-arcade") + ". Then cookies or ice cream in Building B at " + L("great-american-cookies") + " and " + L("marble-slab-creamery") + H("marble-slab-creamery") + ". " + L("amici-30a-italian-kitchen-2") + " has gelato and a family-style room."; } },
+      return "Here’s a day at 30Avenue — park once and spend the day:" +
+        '<div class="step"><b>Morning</b></div>' + C("canopy-road-cafe", "From-scratch breakfast") +
+        '<div class="step"><b>Late morning</b></div>' + C("willow-mercer", "Browse the boutiques") + C("30a-olive-oil", "Taste before you buy") +
+        '<div class="step"><b>Afternoon</b></div>' + C("attycats-arcade", "Games for kids, teens and grown-ups") +
+        '<div class="step"><b>Evening</b></div>' + C("cuvee-30a", "Dinner") + (ev ? '<div class="step">Then <b>' + esc(ev.title) + "</b> · " + fmt(ev.date) + ", " + esc(ev.time) + "</div>" : ""); } },
+    { k: /breakfast|brunch|coffee|pancake|morning/i, r: function () { return "Breakfast is easy — this is the spot:" + C("canopy-road-cafe", "Omelets, French toast, giant pancakes"); } },
+    { k: /date|romantic|anniversar|nice dinner|fancy|upscale/i, r: function () { return "Three picks for a night out:" + C("cuvee-30a") + C("aja-elevated-asian") + C("obscure-wine-company", "50 wines by the glass"); } },
+    { k: /kid|child|family|rain|arcade|game|bored/i, r: function () { return "With kids, start with games, then something sweet in Building B:" + C("attycats-arcade") + C("marble-slab-creamery") + C("great-american-cookies") + "For dinner, " + L("amici-30a-italian-kitchen-2") + " has gelato and a family-style room."; } },
     { k: /music|tonight|event|band|live|happening|this week/i, r: function () { var e = nextEvents(3); if (!e.length) return 'Nothing is listed yet for the coming days. <a href="/calendar/">See the calendar</a>'; return "Coming up on the 30Avenue calendar:<ul>" + e.map(function (x) { return "<li><b>" + fmt(x.date) + ", " + esc(x.time) + "</b> — " + esc(x.title) + "</li>"; }).join("") + '</ul><a href="/calendar/">See every event</a>'; } },
-    { k: /wine|beer|drink|cocktail|bar|happy hour/i, r: function () { return "For a drink: " + L("obscure-wine-company") + " (sommelier-owned wine bar and shop" + H("obscure-wine-company") + ") or " + L("idyll-hound-proper") + ", a fun, funky pub with exceptional brews."; } },
-    { k: /seafood|fish|shrimp|oyster/i, r: function () { return L("goatfeathers-seafood-market") + " is a seafood restaurant, fish market and specialty store" + H("goatfeathers-seafood-market") + ". Dine in or take it to go."; } },
-    { k: /mexican|taco|italian|pizza|sushi|asian|lunch|eat|hungry|food|dinner|restaurant/i, r: function () { return "Places to eat at 30Avenue:<ul><li>" + L("amigos-30a-mexican-kitchen") + "</li><li>" + L("amici-30a-italian-kitchen-2") + "</li><li>" + L("aja-elevated-asian") + "</li><li>" + L("goatfeathers-seafood-market") + "</li><li>" + L("idyll-hound-proper") + '</li></ul><a href="/dining/">See all dining</a>'; } },
-    { k: /shop|boutique|cloth|gift|fashion|olive|decor|home|interior/i, r: function () { return "Shopping picks:<ul><li>" + L("willow-mercer") + " — street-chic style for men and women</li><li>" + L("southern-charm") + " — artisan-made apparel</li><li>" + L("30a-olive-oil") + " — sample oils and balsamics in store</li><li>" + L("not-too-shabby-store") + " — hand-finished furniture and decor</li></ul>"; } },
-    { k: /yoga|spa|wellness|hair|salon|beauty|massage|facial/i, r: function () { return "To relax: " + L("myst") + " for yoga, " + L("rollands-beauty-bar") + " for hair and facials, or " + L("30a-medical-spa") + H("30a-medical-spa") + "."; } },
+    { k: /wine|beer|drink|cocktail|bar|happy hour/i, r: function () { return "Two good places for a drink:" + C("obscure-wine-company", "Sommelier-owned wine bar and shop") + C("idyll-hound-proper", "A fun, funky pub"); } },
+    { k: /seafood|fish|shrimp|oyster/i, r: function () { return "For seafood, go here — dine in or take it to go:" + C("goatfeathers-seafood-market", "Restaurant, fish market and specialty store"); } },
+    { k: /mexican|taco|italian|pizza|sushi|asian|lunch|eat|hungry|food|dinner|restaurant/i, r: function () { return "A few places to eat:" + C("amigos-30a-mexican-kitchen") + C("amici-30a-italian-kitchen-2") + C("aja-elevated-asian") + '<a class="more" href="/dining/">See all dining</a>'; } },
+    { k: /shop|boutique|cloth|gift|fashion|olive|decor|home|interior/i, r: function () { return "Shopping picks:" + C("willow-mercer", "Street-chic style for men and women") + C("southern-charm", "Artisan-made apparel") + C("not-too-shabby-store", "Hand-finished furniture") + '<a class="more" href="/shopping/">See all shopping</a>'; } },
+    { k: /yoga|spa|wellness|hair|salon|beauty|massage|facial/i, r: function () { return "To unwind:" + C("myst", "Yoga") + C("rollands-beauty-bar", "Hair and facials") + C("30a-medical-spa"); } },
     { k: /park|parking|where|address|direction|get there|location|underpass|bike|walk/i, r: function () { return "30Avenue is at <b>12805 US-98 East, Inlet Beach, FL 32461</b>, where 30A meets Highway 98. Parking lots surround the buildings. Walking or biking? The new U.S. 98 pedestrian underpass just east of C.R. 30A is open. " + '<a href="' + esc(AVE.site.maps) + '" target="_blank" rel="noopener" aria-label="Get directions in Google Maps (opens in a new tab)">Get directions</a>'; } },
     { k: /hours|open|close|when/i, r: function () { return "Hours are set by each business. Some examples: " + L("canopy-road-cafe") + H("canopy-road-cafe") + "; " + L("attycats-arcade") + H("attycats-arcade") + "; " + L("obscure-wine-company") + H("obscure-wine-company") + '. <a href="/map/">The map lists every business’s hours.</a>'; } },
     { k: /^(hi|hey|hello|yo|sup)\b/i, r: function () { return "Hi! Tell me who you’re with and what you’re in the mood for — I’ll build a plan."; } },
@@ -256,17 +266,23 @@
   var FALLBACK = "This preview only knows a few topics. Try one of the suggestions below — like “plan my day” or “live music tonight”. The live version will answer questions like yours in full.";
 
   chats.forEach(function (chat) {
-    var log = $(".chat-log", chat), form = $(".chat-form", chat), input = $("input", form);
+    var log = $(".chat-log", chat), form = $(".chat-form", chat);
+    if (!form) return;
+    var input = $("input", form);
+    var ORB = '<span class="orb av" aria-hidden="true"><i></i></span>';
     function add(html, who) {
-      var d = document.createElement("div"); d.className = "msg " + who; d.innerHTML = html; log.appendChild(d); log.scrollTop = log.scrollHeight; return d;
+      var row = document.createElement("div"); row.className = "row " + who;
+      row.innerHTML = (who === "bot" ? ORB : "") + '<div class="col"><span class="who">' + (who === "bot" ? "Concierge" : "You") + '</span><div class="bubble">' + html + "</div></div>";
+      log.appendChild(row); log.scrollTop = log.scrollHeight; return $(".bubble", row);
     }
     function reply(text) {
       add(esc(text), "me");
-      var t = add('<span class="typing" aria-label="Typing"><i></i><i></i><i></i></span>', "bot");
+      var t = add('<span class="typing" role="img" aria-label="Concierge is typing"><i></i><i></i><i></i></span>', "bot");
       var hit = null; for (var i = 0; i < INTENTS.length; i++) if (INTENTS[i].k.test(text)) { hit = INTENTS[i]; break; }
-      setTimeout(function () { t.innerHTML = hit ? hit.r() : esc(FALLBACK); log.scrollTop = log.scrollHeight; }, reduce ? 50 : 650);
+      setTimeout(function () { t.innerHTML = hit ? hit.r() : esc(FALLBACK); log.scrollTop = log.scrollHeight; }, reduce ? 50 : 750);
     }
     form.addEventListener("submit", function (e) { e.preventDefault(); var v = input.value.trim(); if (!v) return; input.value = ""; reply(v); });
+    if (chat.classList.contains("mock")) return;
     $$(".chat-sugg button", chat).forEach(function (b) { b.addEventListener("click", function () { reply(b.textContent); }); });
   });
 
